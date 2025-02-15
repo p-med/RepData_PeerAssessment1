@@ -5,6 +5,7 @@
 library(data.table)
 library(here)
 library(tidyverse)
+library(patchwork)
 
 #Load data
   #Directory
@@ -36,16 +37,15 @@ activity <- activity %>%
   mutate(day = lubridate::wday(date, label = TRUE))
 
 dailysteps <- activity %>%
-  mutate(day = lubridate::wday(date, label = TRUE)) %>%
-  group_by(day) %>%
+  group_by(date) %>%
   summarise(total_steps = sum(steps, na.rm=T))
 
 meansteps <- activity %>%
-  mutate(day = lubridate::wday(date, label = TRUE)) %>%
-  group_by(day) %>%
+  group_by(date) %>%
   summarise(avg_steps = mean(steps, na.rm=T))
 
 hist(meansteps$avg_steps)
+hist(dailysteps$total_steps)
 
 meansteps <- mean(dailysteps$total_steps)
 mediansteps <- median(dailysteps$total_steps)
@@ -93,6 +93,7 @@ no_na_meansteps <- no_na_activity %>%
 
 hist(no_na_meansteps$avg_steps)
 
+
 no_na_dpattern <- no_na_activity %>%
   group_by(day, interval) %>%
   summarise(mean_steps = mean(steps, na.rm=T))
@@ -120,7 +121,7 @@ weeks <- weeks %>%
   group_by(weeks, interval) %>%
   summarise(avg_steps = mean(steps))
 
-ggplot(weeks, aes(interval, avg_steps, colour = avg_steps)) + 
+ggplot(weeks, aes(interval, avg_steps)) + 
   geom_line() + 
   facet_wrap(~ weeks, scales = "free_y", ncol = 1) +
   ylab("Average Steps") + xlab("Interval")
